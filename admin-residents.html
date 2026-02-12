@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Residents - Barangay New Cabalan Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>🏛️ Barangay New Cabalan</h1>
+                <p>Admin Dashboard</p>
+            </div>
+            <nav>
+                <a href="admin-dashboard.html">Dashboard</a>
+                <a href="admin-requests.html">Requests</a>
+                <a href="admin-residents.html" class="active">Residents</a>
+                <a href="admin-reports.html">Reports</a>
+                <a href="admin-settings.html">Settings</a>
+                <a href="#" onclick="adminLogout(); return false;">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container dashboard">
+            <div class="dashboard-header">
+                <h2>Resident Database</h2>
+                <div>
+                    <input type="text" id="search-residents" placeholder="Search by name, email, or phone..." 
+                           class="form-control" onkeyup="searchResidents()">
+                </div>
+            </div>
+
+            <div class="residents-list" id="residents-list"></div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Barangay New Cabalan. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Document - Barangay New Cabalan Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>🏛️ Barangay New Cabalan</h1>
+                <p>Document Request Portal</p>
+            </div>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="tracking.html">Track Request</a>
+                <a href="login.html" id="nav-login">Login</a>
+                <a href="register.html" id="nav-register">Register</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="form-container" style="max-width: 800px;">
+            <h2>Request Document</h2>
+            <div id="alert-container"></div>
+            <div id="duplicate-warning"></div>
+            
+            <form id="request-form">
+                <div class="form-group">
+                    <label for="documentType">Document Type *</label>
+                    <select id="documentType" name="documentType" required>
+                        <option value="">Select a document...</option>
+                        <option value="Barangay Clearance">Barangay Clearance</option>
+                        <option value="Certificate of Indigency">Certificate of Indigency</option>
+                        <option value="Certificate of Residency">Certificate of Residency</option>
+                        <option value="Business Permit Clearance">Business Permit Clearance</option>
+                        <option value="Community Tax Certificate">Community Tax Certificate</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthdate">Birthdate *</label>
+                    <input type="date" id="birthdate" name="birthdate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Complete Address *</label>
+                    <textarea id="address" name="address" rows="3" required></textarea>
+                    <small>Include house number, street, barangay, city</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required>
+                    <small>We'll send updates about your request</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" name="phone" placeholder="09XXXXXXXXX" required>
+                    <small>Format: 09XXXXXXXXX or +639XXXXXXXXX</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="purpose">Purpose of Request</label>
+                    <textarea id="purpose" name="purpose" rows="3" placeholder="Optional: Explain why you need this document"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Required Documents</label>
+                    <div class="file-upload-area" id="file-upload-area">
+                        <p>📎 Click or drag files here to upload</p>
+                        <p style="font-size: 0.875rem; color: var(--text-light); margin-top: 0.5rem;">
+                            Valid ID, Proof of Residency, Photos, etc.
+                        </p>
+                        <input type="file" id="file-input" multiple style="display: none;" accept="image/*,.pdf">
+                    </div>
+                    <div id="file-list" class="file-list"></div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="index.html" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+
+                <div style="margin-top: 1rem; padding: 1rem; background: #eff6ff; border-radius: 0.5rem;">
+                    <p style="font-size: 0.875rem; color: #1e40af;">
+                        <strong>Note:</strong> You don't need an account to submit a request. You'll receive a tracking number to monitor your request status. 
+                        <a href="register.html">Create an account</a> to manage all your requests in one place.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Barangay New Cabalan. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/requests.js"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Barangay New Cabalan Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>🏛️ Barangay New Cabalan</h1>
+                <p>Admin Dashboard</p>
+            </div>
+            <nav>
+                <a href="admin-dashboard.html">Dashboard</a>
+                <a href="admin-requests.html">Requests</a>
+                <a href="admin-residents.html">Residents</a>
+                <a href="admin-reports.html">Reports</a>
+                <a href="admin-settings.html" class="active">Settings</a>
+                <a href="#" onclick="adminLogout(); return false;">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container dashboard">
+            <div class="dashboard-header">
+                <h2>Portal Settings</h2>
+                <button onclick="saveSettings()" class="btn btn-primary">Save Settings</button>
+            </div>
+            <div id="settings-alert"></div>
+            <div class="form-container" style="max-width: 700px;">
+                <h3>Office Hours</h3>
+                <div class="form-group">
+                    <label>Office Hours (displayed on public pages)</label>
+                    <input type="text" id="office-hours" placeholder="e.g. Monday-Friday, 8:00 AM - 5:00 PM">
+                </div>
+                <h3 style="margin-top: 2rem;">Fees (Optional - for display only)</h3>
+                <div class="form-group">
+                    <label>Barangay Clearance Fee (PHP)</label>
+                    <input type="number" id="fee-clearance" min="0" step="0.01" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Certificate of Indigency Fee (PHP)</label>
+                    <input type="number" id="fee-indigency" min="0" step="0.01" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Certificate of Residency Fee (PHP)</label>
+                    <input type="number" id="fee-residency" min="0" step="0.01" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Other Documents Default Fee (PHP)</label>
+                    <input type="number" id="fee-other" min="0" step="0.01" placeholder="0">
+                </div>
+                <h3 style="margin-top: 2rem;">Request Limits</h3>
+                <div class="form-group">
+                    <label>Duplicate cooldown (days)</label>
+                    <input type="number" id="cooldown-days" min="1" value="30">
+                    <small>Warn when same document type is requested within this many days.</small>
+                </div>
+                <div class="form-group">
+                    <label>Max requests per email per day</label>
+                    <input type="number" id="max-email-day" min="1" value="3">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Barangay New Cabalan. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/admin.js"></script>
+    <script>
+        (function() {
+            const key = 'brgyPortalSettings';
+            const defaults = {
+                officeHours: 'Monday-Friday, 8:00 AM - 5:00 PM',
+                fees: { clearance: 0, indigency: 0, residency: 0, other: 0 },
+                cooldownDays: 30,
+                maxEmailPerDay: 3
+            };
+            function load() {
+                try {
+                    const s = JSON.parse(localStorage.getItem(key) || '{}');
+                    document.getElementById('office-hours').value = s.officeHours || defaults.officeHours;
+                    document.getElementById('fee-clearance').value = (s.fees && s.fees.clearance) || defaults.fees.clearance;
+                    document.getElementById('fee-indigency').value = (s.fees && s.fees.indigency) || defaults.fees.indigency;
+                    document.getElementById('fee-residency').value = (s.fees && s.fees.residency) || defaults.fees.residency;
+                    document.getElementById('fee-other').value = (s.fees && s.fees.other) || defaults.fees.other;
+                    document.getElementById('cooldown-days').value = s.cooldownDays || defaults.cooldownDays;
+                    document.getElementById('max-email-day').value = s.maxEmailPerDay || defaults.maxEmailPerDay;
+                } catch (e) {}
+            }
+            window.saveSettings = function() {
+                const s = {
+                    officeHours: document.getElementById('office-hours').value.trim() || defaults.officeHours,
+                    fees: {
+                        clearance: parseFloat(document.getElementById('fee-clearance').value) || 0,
+                        indigency: parseFloat(document.getElementById('fee-indigency').value) || 0,
+                        residency: parseFloat(document.getElementById('fee-residency').value) || 0,
+                        other: parseFloat(document.getElementById('fee-other').value) || 0
+                    },
+                    cooldownDays: parseInt(document.getElementById('cooldown-days').value, 10) || 30,
+                    maxEmailPerDay: parseInt(document.getElementById('max-email-day').value, 10) || 3
+                };
+                localStorage.setItem(key, JSON.stringify(s));
+                var alert = document.getElementById('settings-alert');
+                alert.innerHTML = '<div class="alert alert-success">Settings saved.</div>';
+                setTimeout(function() { alert.innerHTML = ''; }, 3000);
+            };
+            document.addEventListener('DOMContentLoaded', load);
+        })();
+    </script>
+</body>
+</html>

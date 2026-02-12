@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Requests - Barangay New Cabalan Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>🏛️ Barangay New Cabalan</h1>
+                <p>Admin Dashboard</p>
+            </div>
+            <nav>
+                <a href="admin-dashboard.html">Dashboard</a>
+                <a href="admin-requests.html" class="active">Requests</a>
+                <a href="admin-residents.html">Residents</a>
+                <a href="admin-reports.html">Reports</a>
+                <a href="admin-settings.html">Settings</a>
+                <a href="#" onclick="adminLogout(); return false;">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container dashboard">
+            <div class="dashboard-header">
+                <h2>Manage Requests</h2>
+                <div>
+                    <select id="status-filter" onchange="filterRequests()" class="form-control">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="for-printing">For Printing</option>
+                        <option value="for-signing">For Signing</option>
+                        <option value="ready">Ready</option>
+                        <option value="completed">Completed</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    <select id="document-filter" onchange="filterRequests()" class="form-control">
+                        <option value="">All Documents</option>
+                        <option value="Barangay Clearance">Barangay Clearance</option>
+                        <option value="Certificate of Indigency">Certificate of Indigency</option>
+                        <option value="Certificate of Residency">Certificate of Residency</option>
+                        <option value="Business Permit Clearance">Business Permit Clearance</option>
+                        <option value="Community Tax Certificate">Community Tax Certificate</option>
+                    </select>
+                    <button onclick="refreshRequests()" class="btn btn-secondary">Refresh</button>
+                </div>
+            </div>
+
+            <div class="requests-list" id="requests-list"></div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Barangay New Cabalan. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

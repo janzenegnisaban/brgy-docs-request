@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Barangay New Cabalan Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>🏛️ Barangay New Cabalan</h1>
+                <p>Admin Dashboard</p>
+            </div>
+            <nav>
+                <a href="admin-dashboard.html" class="active">Dashboard</a>
+                <a href="admin-requests.html">Requests</a>
+                <a href="admin-residents.html">Residents</a>
+                <a href="admin-reports.html">Reports</a>
+                <a href="admin-settings.html">Settings</a>
+                <a href="#" onclick="adminLogout(); return false;">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container dashboard">
+            <div class="dashboard-header">
+                <h2>Admin Dashboard</h2>
+                <div>
+                    <button onclick="refreshDashboard()" class="btn btn-secondary">Refresh</button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="stat-total">0</h3>
+                    <p>Total Requests</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-pending">0</h3>
+                    <p>Pending Review</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-printing">0</h3>
+                    <p>For Printing</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-signing">0</h3>
+                    <p>For Signing</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-ready">0</h3>
+                    <p>Ready for Pickup</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-completed">0</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+
+            <div class="admin-dashboard-grid">
+                <section class="admin-card">
+                    <div class="admin-card-header">
+                        <h3>Quick actions</h3>
+                        <span class="admin-muted">Common admin tasks</span>
+                    </div>
+                    <div class="admin-quick-actions">
+                        <a class="quick-action" href="admin-requests.html">
+                            <div class="quick-action-title">Open request queue</div>
+                            <div class="quick-action-sub">Review and update statuses</div>
+                        </a>
+                        <a class="quick-action" href="admin-reports.html">
+                            <div class="quick-action-title">View reports</div>
+                            <div class="quick-action-sub">Volumes and processing time</div>
+                        </a>
+                        <a class="quick-action" href="admin-residents.html">
+                            <div class="quick-action-title">Resident database</div>
+                            <div class="quick-action-sub">Search residents and history</div>
+                        </a>
+                        <a class="quick-action" href="admin-settings.html">
+                            <div class="quick-action-title">Settings</div>
+                            <div class="quick-action-sub">Office hours, fees, limits</div>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="admin-card">
+                    <div class="admin-card-header">
+                        <h3>Needs attention</h3>
+                        <span class="admin-muted">Top items to process</span>
+                    </div>
+                    <div id="pending-actions" class="admin-attention-list"></div>
+                </section>
+
+                <section class="admin-card" style="grid-column: 1 / -1;">
+                    <div class="admin-card-header">
+                        <h3>Latest requests</h3>
+                        <div class="admin-actions-row">
+                            <a class="btn btn-outline btn-sm" href="admin-requests.html">Manage all</a>
+                            <button class="btn btn-secondary btn-sm" onclick="refreshDashboard()">Refresh</button>
+                        </div>
+                    </div>
+                    <div id="recent-requests"></div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Barangay New Cabalan. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

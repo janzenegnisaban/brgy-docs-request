@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Analytics - Barangay New Cabalan Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .report-card { background: var(--bg-white); padding: 1.5rem; border-radius: 0.75rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+        .report-card h4 { margin-bottom: 1rem; color: var(--text-dark); }
+        .report-table { width: 100%; border-collapse: collapse; }
+        .report-table th, .report-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .report-table th { background: var(--bg-light); font-weight: 600; }
+        .chart-placeholder { height: 200px; background: var(--bg-light); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: var(--text-light); margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>🏛️ Barangay New Cabalan</h1>
+                <p>Admin Dashboard</p>
+            </div>
+            <nav>
+                <a href="admin-dashboard.html">Dashboard</a>
+                <a href="admin-requests.html">Requests</a>
+                <a href="admin-residents.html">Residents</a>
+                <a href="admin-reports.html" class="active">Reports</a>
+                <a href="admin-settings.html">Settings</a>
+                <a href="#" onclick="adminLogout(); return false;">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container dashboard">
+            <div class="dashboard-header">
+                <h2>Reports & Analytics</h2>
+                <button onclick="loadReports()" class="btn btn-secondary">Refresh</button>
+            </div>
+
+            <div class="stats-grid" style="margin-bottom: 2rem;">
+                <div class="stat-card">
+                    <h3 id="r-total">0</h3>
+                    <p>Total Requests (All Time)</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="r-completed">0</h3>
+                    <p>Completed</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="r-avg-days">-</h3>
+                    <p>Avg. Processing (days)</p>
+                </div>
+            </div>
+
+            <div class="report-card">
+                <h4>Requests by Document Type</h4>
+                <table class="report-table" id="report-by-type">
+                    <thead><tr><th>Document Type</th><th>Count</th><th>%</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="report-card">
+                <h4>Requests by Status</h4>
+                <table class="report-table" id="report-by-status">
+                    <thead><tr><th>Status</th><th>Count</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="report-card">
+                <h4>Recent Activity (Last 30 days)</h4>
+                <div class="chart-placeholder" id="recent-activity">Loading...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Barangay New Cabalan. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/admin-reports.js"></script>
+</body>
+</html>
