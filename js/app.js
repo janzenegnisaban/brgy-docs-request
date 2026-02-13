@@ -4,7 +4,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Check if user is logged in and update navigation
     updateNavigation();
-    
+    // Header scroll effect (subtle shadow on scroll)
+    var header = document.querySelector('header');
+    if (header) {
+        function onScroll() {
+            header.classList.toggle('scrolled', window.scrollY > 20);
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    }
     // Initialize any page-specific functionality
     const currentPage = window.location.pathname.split('/').pop();
     

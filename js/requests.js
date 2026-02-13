@@ -1,23 +1,164 @@
 // Request Management Logic
 
 let uploadedFiles = [];
+let photo2x2File = null;
+
+// Which fields to show and require per document type
+var DOCUMENT_FIELDS = {
+    'Barangay Clearance': {
+        required: ['fullName', 'birthdate', 'address', 'email', 'phone'],
+        optional: ['purpose'],
+        fileHint: 'Valid ID (front & back), Proof of Residency',
+        purposeLabel: 'Purpose of Request (optional)'
+    },
+    'Certificate of Indigency': {
+        required: ['fullName', 'birthdate', 'address', 'email', 'phone', 'purpose'],
+        optional: [],
+        fileHint: 'Valid ID (front & back), Proof of Residency, Proof of income/indigency if any',
+        purposeLabel: 'Reason for requesting (e.g. scholarship, medical assistance) *'
+    },
+    'Certificate of Residency': {
+        required: ['fullName', 'address', 'email', 'phone'],
+        optional: ['birthdate', 'purpose'],
+        fileHint: 'Proof of Residency (billing, lease, or barangay certification)',
+        purposeLabel: 'Purpose of Request (optional)'
+    },
+    'Business Permit Clearance': {
+        required: ['fullName', 'address', 'email', 'phone'],
+        optional: ['birthdate', 'purpose'],
+        extra: [
+            { id: 'businessName', label: 'Business / Trade Name *', type: 'text', required: true },
+            { id: 'businessAddress', label: 'Business Address (if different)', type: 'textarea', required: false }
+        ],
+        fileHint: 'Valid ID, Business registration or DTI docs if available',
+        purposeLabel: 'Purpose of Request (optional)'
+    },
+    'Community Tax Certificate': {
+        required: ['fullName', 'birthdate', 'address', 'email', 'phone'],
+        optional: ['purpose'],
+        fileHint: 'Valid ID (for verification)',
+        purposeLabel: 'Purpose of Request (optional)'
+    },
+    'Other': {
+        required: ['fullName', 'birthdate', 'address', 'email', 'phone', 'purpose'],
+        optional: [],
+        fileHint: 'Valid ID, any supporting documents',
+        purposeLabel: 'Specify document needed and purpose *'
+    }
+};
+
+function getDocumentConfig(docType) {
+    return DOCUMENT_FIELDS[docType] || DOCUMENT_FIELDS['Other'];
+}
+
+function updateFormForDocument(docType) {
+    var config = getDocumentConfig(docType);
+    var allFields = ['documentType', 'fullName', 'birthdate', 'address', 'email', 'phone', 'purpose', 'files'];
+    var requiredSet = config.required || [];
+    var optionalSet = config.optional || [];
+    var showSet = requiredSet.concat(optionalSet);
+    showSet.push('documentType');
+    showSet.push('files');
+
+    allFields.forEach(function(field) {
+        var el = document.querySelector('.form-group[data-field="' + field + '"]');
+        if (!el) return;
+        if (field === 'documentType' || field === 'files') {
+            el.style.display = '';
+            return;
+        }
+        var show = showSet.indexOf(field) >= 0;
+        el.style.display = show ? '' : 'none';
+        var input = el.querySelector('input, textarea, select');
+        var label = el.querySelector('label');
+        if (input) {
+            input.required = requiredSet.indexOf(field) >= 0;
+            if (field === 'purpose' && label) {
+                label.textContent = config.purposeLabel || 'Purpose of Request';
+                if (input.required) label.innerHTML += ' *';
+            }
+        }
+    });
+
+    // Show/hide 2x2 picture field based on document type
+    var photo2x2Group = document.getElementById('photo2x2-group');
+    var requires2x2 = doesDocRequire2x2(docType);
+    if (photo2x2Group) {
+        photo2x2Group.style.display = requires2x2 ? '' : 'none';
+        var photo2x2Input = document.getElementById('photo2x2-input');
+        if (photo2x2Input) {
+            photo2x2Input.required = requires2x2;
+        }
+        // Clear 2x2 picture if document type doesn't require it
+        if (!requires2x2) {
+            photo2x2File = null;
+            var preview = document.getElementById('photo2x2-preview');
+            if (preview) preview.innerHTML = '';
+        }
+    }
+
+    var fileLabel = document.getElementById('file-upload-label');
+    var fileHint = document.getElementById('file-upload-hint');
+    if (fileLabel) fileLabel.textContent = config.fileHint ? 'Documents to upload' : 'Required Documents';
+    if (fileHint) fileHint.textContent = config.fileHint || 'Valid ID, Proof of Residency, etc.';
+
+    var extraContainer = document.getElementById('extra-fields-container');
+    if (!extraContainer) return;
+    extraContainer.innerHTML = '';
+    extraContainer.style.display = 'none';
+    if (config.extra && config.extra.length) {
+        extraContainer.style.display = '';
+        config.extra.forEach(function(f) {
+            var div = document.createElement('div');
+            div.className = 'form-group';
+            div.style.marginBottom = '1rem';
+            var label = document.createElement('label');
+            label.setAttribute('for', f.id);
+            label.textContent = f.label;
+            var input = f.type === 'textarea'
+                ? document.createElement('textarea')
+                : document.createElement('input');
+            input.id = input.name = f.id;
+            input.type = f.type === 'textarea' ? null : (f.type || 'text');
+            if (f.type === 'textarea') input.rows = 2;
+            input.required = f.required || false;
+            div.appendChild(label);
+            div.appendChild(input);
+            extraContainer.appendChild(div);
+        });
+    }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
-    const requestForm = document.getElementById('request-form');
+    var docParam = getQueryParam('doc');
+    if (docParam) {
+        var select = document.getElementById('documentType');
+        if (select) {
+            select.value = docParam;
+            var subtitle = document.getElementById('form-subtitle');
+            if (subtitle) subtitle.textContent = 'Requesting: ' + docParam;
+        }
+        updateFormForDocument(docParam);
+    }
+
+    var documentTypeSelect = document.getElementById('documentType');
+    if (documentTypeSelect) {
+        documentTypeSelect.addEventListener('change', function() {
+            var docType = documentTypeSelect.value;
+            var subtitle = document.getElementById('form-subtitle');
+            if (subtitle) subtitle.textContent = docType ? 'Requesting: ' + docType : '';
+            updateFormForDocument(docType || 'Other');
+            checkDuplicateOnChange();
+        });
+    }
+
+    var requestForm = document.getElementById('request-form');
     if (requestForm) {
         requestForm.addEventListener('submit', handleRequestSubmit);
-        
-        // Check for duplicates on document type change
-        const documentTypeSelect = document.getElementById('documentType');
-        if (documentTypeSelect) {
-            documentTypeSelect.addEventListener('change', checkDuplicateOnChange);
-        }
-        
-        // File upload handling
-        setupFileUpload();
+        checkDuplicateOnChange();
     }
-    
-    // Update navigation if logged in
+    setupFileUpload();
+    setupPhoto2x2Upload();
     updateRequestFormNavigation();
 });
 
@@ -74,6 +215,91 @@ function setupFileUpload() {
         const files = Array.from(e.target.files);
         handleFiles(files);
     });
+}
+
+// Setup 2x2 photo upload
+function setupPhoto2x2Upload() {
+    const uploadArea = document.getElementById('photo2x2-upload-area');
+    const photoInput = document.getElementById('photo2x2-input');
+    const preview = document.getElementById('photo2x2-preview');
+    
+    if (!uploadArea || !photoInput) return;
+    
+    uploadArea.addEventListener('click', () => photoInput.click());
+    
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const files = Array.from(e.dataTransfer.files);
+        if (files.length > 0) {
+            handlePhoto2x2(files[0]);
+        }
+    });
+    
+    photoInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handlePhoto2x2(e.target.files[0]);
+        }
+    });
+}
+
+// Handle 2x2 photo upload
+function handlePhoto2x2(file) {
+    if (!file.type || file.type.indexOf('image/') !== 0) {
+        showAlert('Please upload an image file for the 2x2 picture', 'error');
+        return;
+    }
+    
+    photo2x2File = {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        id: Date.now() + Math.random()
+    };
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const preview = document.getElementById('photo2x2-preview');
+        if (preview) {
+            preview.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--bg-light); border-radius: 0.5rem; border: 2px solid var(--primary-color);">
+                    <img src="${e.target.result}" alt="2x2 Preview" style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.25rem; border: 2px solid var(--border-color);">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.25rem;">${file.name}</div>
+                        <div style="font-size: 0.875rem; color: var(--text-light);">${formatFileSize(file.size)}</div>
+                        <button type="button" onclick="removePhoto2x2()" class="btn btn-danger btn-sm" style="margin-top: 0.5rem;">Remove</button>
+                    </div>
+                </div>
+            `;
+        }
+    };
+    reader.readAsDataURL(file);
+    
+    // Store file data for submission
+    resizeImageFileToDataUrl(file, { maxWidth: 600, maxHeight: 600, quality: 0.9 }).then(function(dataUrl) {
+        photo2x2File.dataUrl = dataUrl;
+    }).catch(function(err) {
+        console.error('Error processing image:', err);
+    });
+}
+
+// Remove 2x2 photo
+function removePhoto2x2() {
+    photo2x2File = null;
+    const preview = document.getElementById('photo2x2-preview');
+    if (preview) preview.innerHTML = '';
+    const photoInput = document.getElementById('photo2x2-input');
+    if (photoInput) photoInput.value = '';
 }
 
 // Handle file selection
@@ -211,27 +437,54 @@ function handleRequestSubmit(e) {
         return;
     }
     
+    // Validate 2x2 picture for documents that require it
+    if (doesDocRequire2x2(documentType)) {
+        if (!photo2x2File || !photo2x2File.dataUrl) {
+            showAlert('A 2x2 picture is required for Barangay Clearance before proceeding. Please upload your 2x2 picture.', 'error', alertContainer);
+            return;
+        }
+    }
+    
     // Check if user is logged in
     const currentUser = getCurrentUser();
     
     // Generate tracking number
     const trackingNumber = generateTrackingNumber();
     
-    // Create request object
-    const request = {
-        trackingNumber,
-        documentType,
-        fullName,
-        birthdate,
-        address,
+    var config = getDocumentConfig(documentType);
+    var extraData = {};
+    if (config.extra && config.extra.length) {
+        config.extra.forEach(function(f) {
+            var el = document.getElementById(f.id);
+            if (el && el.value) extraData[f.id] = el.value.trim();
+        });
+    }
+
+    var request = {
+        trackingNumber: trackingNumber,
+        documentType: documentType,
+        fullName: fullName,
+        birthdate: birthdate || null,
+        address: address,
         email: email.toLowerCase(),
         phone: normalizePhone(phone),
         purpose: purpose || null,
         status: 'pending',
         submittedAt: new Date().toISOString(),
-        files: uploadedFiles.map(f => ({ name: f.name, size: f.size })),
+        files: uploadedFiles.map(function(f) { return { name: f.name, size: f.size }; }),
         userId: currentUser ? currentUser.id : null
     };
+    if (Object.keys(extraData).length) request.extra = extraData;
+    
+    // Add 2x2 picture if required and uploaded
+    if (doesDocRequire2x2(documentType) && photo2x2File && photo2x2File.dataUrl) {
+        request.photo2x2 = {
+            name: photo2x2File.name,
+            size: photo2x2File.size,
+            type: photo2x2File.type,
+            dataUrl: photo2x2File.dataUrl
+        };
+    }
     
     // Save request
     if (currentUser) {
@@ -252,7 +505,10 @@ function handleRequestSubmit(e) {
     // Clear form
     document.getElementById('request-form').reset();
     uploadedFiles = [];
+    photo2x2File = null;
     document.getElementById('file-list').innerHTML = '';
+    const photo2x2Preview = document.getElementById('photo2x2-preview');
+    if (photo2x2Preview) photo2x2Preview.innerHTML = '';
     
     // Redirect to tracking page
     setTimeout(() => {
@@ -263,3 +519,4 @@ function handleRequestSubmit(e) {
 // Make functions available globally
 window.removeFile = removeFile;
 window.proceedAnyway = proceedAnyway;
+window.removePhoto2x2 = removePhoto2x2;

@@ -243,9 +243,14 @@ function displayAdminRequests(requests, containerId) {
         );
         const isDuplicate = duplicates && duplicates.length > 1;
         
+        // Check if 2x2 picture is missing for documents that require it
+        const requires2x2 = doesDocRequire2x2(request.documentType);
+        const missing2x2 = requires2x2 && (!request.photo2x2 || !request.photo2x2.dataUrl);
+        
         return `
             <div class="request-card admin-view ${isDuplicate ? 'duplicate-flag' : ''}">
                 ${isDuplicate ? '<span class="duplicate-indicator">⚠️ Potential Duplicate</span>' : ''}
+                ${missing2x2 ? '<span class="duplicate-indicator" style="background: var(--cta-red);">📷 Missing 2x2 Picture</span>' : ''}
                 <div class="request-header">
                     <div>
                         <div class="request-title">${request.documentType}</div>
@@ -309,31 +314,44 @@ function updateRequestStatus(trackingNumber, newStatus) {
     const guestRequests = JSON.parse(localStorage.getItem('guestRequests') || '[]');
     const userRequests = JSON.parse(localStorage.getItem('userRequests') || '[]');
     
-    // Find and update in guest requests
+    // Find request
     let request = guestRequests.find(r => r.trackingNumber === trackingNumber);
-    if (request) {
-        request.status = newStatus;
-        request.updatedAt = new Date().toISOString();
-        localStorage.setItem('guestRequests', JSON.stringify(guestRequests));
-    } else {
-        // Find and update in user requests
+    let isGuestRequest = true;
+    if (!request) {
         request = userRequests.find(r => r.trackingNumber === trackingNumber);
-        if (request) {
-            request.status = newStatus;
-            request.updatedAt = new Date().toISOString();
-            localStorage.setItem('userRequests', JSON.stringify(userRequests));
+        isGuestRequest = false;
+    }
+    
+    if (!request) {
+        showAlert('Request not found', 'error');
+        return;
+    }
+    
+    // Validate 2x2 picture requirement for printing status
+    if (newStatus === 'for-printing' && doesDocRequire2x2(request.documentType)) {
+        if (!request.photo2x2 || !request.photo2x2.dataUrl) {
+            showAlert('Cannot proceed to printing: A 2x2 picture is required for Barangay Clearance documents. Please ensure the resident has uploaded their 2x2 picture before changing status to "For Printing".', 'error');
+            return;
         }
     }
     
-    if (request) {
-        addNotification(request.trackingNumber, 'Status updated to: ' + newStatus.replace(/-/g, ' '), 'info');
-        showAlert(`Request status updated to: ${newStatus.replace(/-/g, ' ')}`, 'success');
-        refreshRequests();
-        
-        // Refresh dashboard if on dashboard page
-        if (window.location.pathname.includes('admin-dashboard.html')) {
-            loadAdminDashboard();
-        }
+    // Update status
+    request.status = newStatus;
+    request.updatedAt = new Date().toISOString();
+    
+    if (isGuestRequest) {
+        localStorage.setItem('guestRequests', JSON.stringify(guestRequests));
+    } else {
+        localStorage.setItem('userRequests', JSON.stringify(userRequests));
+    }
+    
+    addNotification(request.trackingNumber, 'Status updated to: ' + newStatus.replace(/-/g, ' '), 'info');
+    showAlert(`Request status updated to: ${newStatus.replace(/-/g, ' ')}`, 'success');
+    refreshRequests();
+    
+    // Refresh dashboard if on dashboard page
+    if (window.location.pathname.includes('admin-dashboard.html')) {
+        loadAdminDashboard();
     }
 }
 
@@ -402,6 +420,21 @@ function viewRequestDetails(trackingNumber) {
                 <div class="request-detail">
                     <label>Uploaded Files</label>
                     <span>${request.files.map(f => f.name).join(', ')}</span>
+                </div>
+                ` : ''}
+                ${doesDocRequire2x2(request.documentType) ? `
+                <div class="request-detail" style="grid-column: 1 / -1;">
+                    <label>2x2 Picture ${request.photo2x2 ? '' : '<span style="color: var(--cta-red); font-weight: normal;">(Required for printing)</span>'}</label>
+                    ${request.photo2x2 && request.photo2x2.dataUrl ? `
+                        <div style="margin-top: 0.5rem;">
+                            <img src="${request.photo2x2.dataUrl}" alt="2x2 Picture" style="width: 150px; height: 150px; object-fit: cover; border-radius: 0.5rem; border: 2px solid var(--border-color); box-shadow: var(--shadow);">
+                            <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-light);">${request.photo2x2.name} (${formatFileSize(request.photo2x2.size)})</div>
+                        </div>
+                    ` : `
+                        <div style="padding: 1rem; background: var(--danger-light); border-radius: 0.5rem; color: #B71C1C; margin-top: 0.5rem;">
+                            ⚠️ 2x2 picture not uploaded. Cannot proceed to printing status until 2x2 picture is provided.
+                        </div>
+                    `}
                 </div>
                 ` : ''}
             </div>
@@ -604,6 +637,15 @@ function searchResidents() {
 // Refresh dashboard
 function refreshDashboard() {
     loadAdminDashboard();
+}
+
+// Format file size
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
 
 // Make functions available globally

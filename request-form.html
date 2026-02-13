@@ -25,11 +25,12 @@
     <main>
         <div class="form-container" style="max-width: 800px;">
             <h2>Request Document</h2>
+            <p id="form-subtitle" style="color: var(--text-light); margin-bottom: 1rem;"></p>
             <div id="alert-container"></div>
             <div id="duplicate-warning"></div>
             
             <form id="request-form">
-                <div class="form-group">
+                <div class="form-group" data-field="documentType">
                     <label for="documentType">Document Type *</label>
                     <select id="documentType" name="documentType" required>
                         <option value="">Select a document...</option>
@@ -42,46 +43,57 @@
                     </select>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" data-field="fullName">
                     <label for="fullName">Full Name *</label>
                     <input type="text" id="fullName" name="fullName" required>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" data-field="birthdate">
                     <label for="birthdate">Birthdate *</label>
-                    <input type="date" id="birthdate" name="birthdate" required>
+                    <input type="date" id="birthdate" name="birthdate">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" data-field="address">
                     <label for="address">Complete Address *</label>
-                    <textarea id="address" name="address" rows="3" required></textarea>
+                    <textarea id="address" name="address" rows="3"></textarea>
                     <small>Include house number, street, barangay, city</small>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" data-field="email">
                     <label for="email">Email Address *</label>
                     <input type="email" id="email" name="email" required>
                     <small>We'll send updates about your request</small>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" data-field="phone">
                     <label for="phone">Phone Number *</label>
                     <input type="tel" id="phone" name="phone" placeholder="09XXXXXXXXX" required>
                     <small>Format: 09XXXXXXXXX or +639XXXXXXXXX</small>
                 </div>
 
-                <div class="form-group">
+                <div id="extra-fields-container" class="form-group" style="display: none;"></div>
+
+                <div class="form-group" data-field="purpose">
                     <label for="purpose">Purpose of Request</label>
-                    <textarea id="purpose" name="purpose" rows="3" placeholder="Optional: Explain why you need this document"></textarea>
+                    <textarea id="purpose" name="purpose" rows="3" placeholder="Explain why you need this document"></textarea>
                 </div>
 
-                <div class="form-group">
-                    <label>Required Documents</label>
+                <div class="form-group" data-field="photo2x2" id="photo2x2-group" style="display: none;">
+                    <label for="photo2x2">2x2 Picture * <span style="font-weight: normal; color: var(--text-light);">(Required for printing)</span></label>
+                    <div class="file-upload-area" id="photo2x2-upload-area" style="min-height: 150px;">
+                        <p>📷 Click or drag 2x2 picture here</p>
+                        <p style="font-size: 0.875rem; color: var(--text-light); margin-top: 0.5rem;">2x2 inches passport size photo (JPG, PNG)</p>
+                        <input type="file" id="photo2x2-input" style="display: none;" accept="image/*">
+                    </div>
+                    <div id="photo2x2-preview" style="margin-top: 1rem;"></div>
+                    <small style="color: var(--text-light); display: block; margin-top: 0.5rem;">A 2x2 picture is required before the document can proceed to printing.</small>
+                </div>
+
+                <div class="form-group" data-field="files">
+                    <label id="file-upload-label">Required Documents</label>
                     <div class="file-upload-area" id="file-upload-area">
                         <p>📎 Click or drag files here to upload</p>
-                        <p style="font-size: 0.875rem; color: var(--text-light); margin-top: 0.5rem;">
-                            Valid ID, Proof of Residency, Photos, etc.
-                        </p>
+                        <p id="file-upload-hint" style="font-size: 0.875rem; color: var(--text-light); margin-top: 0.5rem;">Valid ID, Proof of Residency, Photos, etc.</p>
                         <input type="file" id="file-input" multiple style="display: none;" accept="image/*,.pdf">
                     </div>
                     <div id="file-list" class="file-list"></div>
@@ -92,8 +104,8 @@
                     <button type="submit" class="btn btn-primary">Submit Request</button>
                 </div>
 
-                <div style="margin-top: 1rem; padding: 1rem; background: #eff6ff; border-radius: 0.5rem;">
-                    <p style="font-size: 0.875rem; color: #1e40af;">
+                <div style="margin-top: 1rem; padding: 1rem; background: #E3F2FD; border-radius: 0.5rem;">
+                    <p style="font-size: 0.875rem; color: var(--primary-dark);">
                         <strong>Note:</strong> You don't need an account to submit a request. You'll receive a tracking number to monitor your request status. 
                         <a href="register.html">Create an account</a> to manage all your requests in one place.
                     </p>
