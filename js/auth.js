@@ -58,11 +58,11 @@ function handleLogin(e) {
         return;
     }
     
-    // Set current user
+    // Set current user (use buildFullName so name is correct for both legacy and new users)
     localStorage.setItem('currentUser', JSON.stringify({
         id: user.id,
         email: user.email,
-        fullName: user.fullName,
+        fullName: buildFullName(user),
         phone: user.phone
     }));
     
@@ -77,30 +77,40 @@ function handleRegister(e) {
     e.preventDefault();
     const alertContainer = document.getElementById('alert-container');
     
-    const fullName = document.getElementById('fullName').value.trim();
-    const birthdate = document.getElementById('birthdate').value;
-    const address = document.getElementById('address').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const firstName = document.getElementById('firstName').value.trim();
+    const middleName = document.getElementById('middleName').value.trim();
+    const suffix = document.getElementById('suffix').value.trim();
     const email = document.getElementById('email').value.trim();
     const phone = document.getElementById('phone').value.trim();
+    const birthplace = document.getElementById('birthplace').value.trim();
+    const birthdate = document.getElementById('birthdate').value;
+    const sex = document.getElementById('sex').value;
+    const civilStatus = document.getElementById('civilStatus').value;
+    const citizenship = document.getElementById('citizenship').value.trim();
+    const profession = document.getElementById('profession').value.trim();
+    const highestEducationAttainment = document.getElementById('highestEducationAttainment').value;
+    const address = document.getElementById('address').value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     
     // Validation
+    if (!lastName || !firstName) {
+        showAlert('Last name and first name are required', 'error', alertContainer);
+        return;
+    }
     if (!isValidEmail(email)) {
         showAlert('Please enter a valid email address', 'error', alertContainer);
         return;
     }
-    
     if (!isValidPhone(phone)) {
         showAlert('Please enter a valid phone number (09XXXXXXXXX or +639XXXXXXXXX)', 'error', alertContainer);
         return;
     }
-    
     if (password.length < 6) {
         showAlert('Password must be at least 6 characters', 'error', alertContainer);
         return;
     }
-    
     if (password !== confirmPassword) {
         showAlert('Passwords do not match', 'error', alertContainer);
         return;
@@ -113,14 +123,27 @@ function handleRegister(e) {
         return;
     }
     
+    // Build fullName for backward compatibility (request form, display)
+    const fullName = [firstName, middleName, lastName, suffix].filter(Boolean).join(' ');
+    
     // Create new user
     const newUser = {
         id: Date.now().toString(),
+        lastName,
+        firstName,
+        middleName,
+        suffix,
         fullName,
-        birthdate,
-        address,
         email: email.toLowerCase(),
         phone: normalizePhone(phone),
+        birthplace: birthplace || null,
+        birthdate,
+        sex: sex || null,
+        civilStatus: civilStatus || null,
+        citizenship: citizenship || 'Filipino',
+        profession: profession || null,
+        highestEducationAttainment: highestEducationAttainment || null,
+        address,
         password, // In production, hash this
         createdAt: new Date().toISOString()
     };
@@ -202,10 +225,13 @@ function showClaimPrompt(requests, userId) {
     const pendingRequests = requests.filter(r => r.status !== 'completed' && r.status !== 'rejected');
     
     if (pendingRequests.length === 0) {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const newUser = users.find(u => u.id === userId);
+        const fullName = newUser ? buildFullName(newUser) : [document.getElementById('firstName').value.trim(), document.getElementById('middleName').value.trim(), document.getElementById('lastName').value.trim(), document.getElementById('suffix').value.trim()].filter(Boolean).join(' ');
         localStorage.setItem('currentUser', JSON.stringify({
             id: userId,
             email: document.getElementById('email').value.trim(),
-            fullName: document.getElementById('fullName').value.trim(),
+            fullName: fullName,
             phone: normalizePhone(document.getElementById('phone').value.trim())
         }));
         redirect('dashboard.html');
@@ -232,7 +258,9 @@ function showClaimPrompt(requests, userId) {
 function claimGuestRequests(userId) {
     const email = document.getElementById('email').value.trim();
     const phone = normalizePhone(document.getElementById('phone').value.trim());
-    const fullName = document.getElementById('fullName').value.trim();
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const newUser = users.find(u => u.id === userId);
+    const fullName = newUser ? buildFullName(newUser) : [document.getElementById('firstName').value.trim(), document.getElementById('middleName').value.trim(), document.getElementById('lastName').value.trim(), document.getElementById('suffix').value.trim()].filter(Boolean).join(' ');
     
     const guestRequests = JSON.parse(localStorage.getItem('guestRequests') || '[]');
     const userRequests = JSON.parse(localStorage.getItem('userRequests') || '[]');
@@ -279,8 +307,10 @@ function claimGuestRequests(userId) {
 // Skip claiming
 function skipClaim(userId) {
     const email = document.getElementById('email').value.trim();
-    const fullName = document.getElementById('fullName').value.trim();
     const phone = normalizePhone(document.getElementById('phone').value.trim());
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const newUser = users.find(u => u.id === userId);
+    const fullName = newUser ? buildFullName(newUser) : [document.getElementById('firstName').value.trim(), document.getElementById('middleName').value.trim(), document.getElementById('lastName').value.trim(), document.getElementById('suffix').value.trim()].filter(Boolean).join(' ');
     
     localStorage.setItem('currentUser', JSON.stringify({
         id: userId,

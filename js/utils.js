@@ -221,6 +221,19 @@ function getCurrentUser() {
     return userStr ? JSON.parse(userStr) : null;
 }
 
+// Build full name from parts (for users who have firstName, lastName, etc.)
+function buildFullName(user) {
+    if (!user) return '';
+    if (user.fullName) return user.fullName;
+    const parts = [
+        user.firstName,
+        user.middleName,
+        user.lastName,
+        user.suffix
+    ].filter(Boolean);
+    return parts.join(' ').trim() || '';
+}
+
 // Logout user
 function logout() {
     localStorage.removeItem('currentUser');

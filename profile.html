@@ -27,17 +27,26 @@
             <h2>Profile & Account Settings</h2>
             <div id="alert-container"></div>
             <form id="profile-form">
-                <div class="form-group">
-                    <label for="fullName">Full Name</label>
-                    <input type="text" id="fullName" name="fullName" required>
+                <h3 style="margin: 0 0 1rem 0; font-size: 1rem; color: var(--text-light);">Name</h3>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="lastName">Last Name *</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">First Name *</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="birthdate">Birthdate</label>
-                    <input type="date" id="birthdate" name="birthdate" required>
-                </div>
-                <div class="form-group">
-                    <label for="address">Address</label>
-                    <textarea id="address" name="address" required></textarea>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="middleName">Middle Name</label>
+                        <input type="text" id="middleName" name="middleName">
+                    </div>
+                    <div class="form-group">
+                        <label for="suffix">Suffix</label>
+                        <input type="text" id="suffix" name="suffix" placeholder="Jr., Sr., III">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="email">Email Address</label>
@@ -45,8 +54,64 @@
                     <small>Email cannot be changed. Contact admin if needed.</small>
                 </div>
                 <div class="form-group">
-                    <label for="phone">Phone Number</label>
+                    <label for="phone">Contact Number *</label>
                     <input type="tel" id="phone" name="phone" placeholder="09XXXXXXXXX" required>
+                </div>
+                <div class="form-group">
+                    <label for="birthplace">Birthplace</label>
+                    <input type="text" id="birthplace" name="birthplace" placeholder="City/Municipality, Province">
+                </div>
+                <div class="form-group">
+                    <label for="birthdate">Birthday *</label>
+                    <input type="date" id="birthdate" name="birthdate" required>
+                </div>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="sex">Sex *</label>
+                        <select id="sex" name="sex" required>
+                            <option value="">Select...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="civilStatus">Civil Status *</label>
+                        <select id="civilStatus" name="civilStatus" required>
+                            <option value="">Select...</option>
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                            <option value="Widowed">Widowed</option>
+                            <option value="Separated">Separated</option>
+                            <option value="Divorced">Divorced</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="citizenship">Citizenship *</label>
+                    <input type="text" id="citizenship" name="citizenship" required>
+                </div>
+                <div class="form-group">
+                    <label for="profession">Profession / Occupation</label>
+                    <input type="text" id="profession" name="profession" placeholder="e.g. Teacher, Driver">
+                </div>
+                <div class="form-group">
+                    <label for="highestEducationAttainment">Highest Education Attainment</label>
+                    <select id="highestEducationAttainment" name="highestEducationAttainment">
+                        <option value="">Select...</option>
+                        <option value="Elementary">Elementary</option>
+                        <option value="High School">High School</option>
+                        <option value="Senior High School">Senior High School</option>
+                        <option value="Vocational">Vocational</option>
+                        <option value="College Undergraduate">College Undergraduate</option>
+                        <option value="College Graduate">College Graduate</option>
+                        <option value="Postgraduate">Postgraduate</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address *</label>
+                    <textarea id="address" name="address" rows="3" required></textarea>
                 </div>
                 <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border-color);">
                 <h3 style="margin-bottom: 1rem;">Change Password</h3>

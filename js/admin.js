@@ -551,25 +551,25 @@ function displayResidents(residents, userRequests, guestRequests) {
             (resident.email && req.email && resident.email.toLowerCase() === req.email.toLowerCase()) ||
             (resident.phone && req.phone && normalizePhone(resident.phone) === normalizePhone(req.phone))
         );
-        
+        const displayName = buildFullName(resident);
         return `
             <div class="resident-card">
                 <div class="resident-header">
                     <div>
-                        <div class="resident-name">${resident.fullName}</div>
+                        <div class="resident-name">${displayName}</div>
                         ${resident.isGuest ? '<span style="font-size: 0.75rem; color: var(--warning-color);">Guest User</span>' : ''}
                     </div>
                     <div class="resident-stats">
                         <span>${residentRequests.length} Request(s)</span>
                     </div>
                 </div>
-                <div class="resident-details">
+                <div class="resident-details" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem;">
                     <div class="request-detail">
                         <label>Email</label>
                         <span>${resident.email || 'N/A'}</span>
                     </div>
                     <div class="request-detail">
-                        <label>Phone</label>
+                        <label>Contact Number</label>
                         <span>${resident.phone || 'N/A'}</span>
                     </div>
                     <div class="request-detail">
@@ -577,8 +577,32 @@ function displayResidents(residents, userRequests, guestRequests) {
                         <span>${resident.address || 'N/A'}</span>
                     </div>
                     <div class="request-detail">
-                        <label>Birthdate</label>
+                        <label>Birthplace</label>
+                        <span>${resident.birthplace || 'N/A'}</span>
+                    </div>
+                    <div class="request-detail">
+                        <label>Birthday</label>
                         <span>${resident.birthdate ? formatDate(resident.birthdate) : 'N/A'}</span>
+                    </div>
+                    <div class="request-detail">
+                        <label>Sex</label>
+                        <span>${resident.sex || 'N/A'}</span>
+                    </div>
+                    <div class="request-detail">
+                        <label>Civil Status</label>
+                        <span>${resident.civilStatus || 'N/A'}</span>
+                    </div>
+                    <div class="request-detail">
+                        <label>Citizenship</label>
+                        <span>${resident.citizenship || 'N/A'}</span>
+                    </div>
+                    <div class="request-detail">
+                        <label>Profession / Occupation</label>
+                        <span>${resident.profession || 'N/A'}</span>
+                    </div>
+                    <div class="request-detail">
+                        <label>Highest Education</label>
+                        <span>${resident.highestEducationAttainment || 'N/A'}</span>
                     </div>
                 </div>
                 ${residentRequests.length > 0 ? `
@@ -599,9 +623,9 @@ function displayResidents(residents, userRequests, guestRequests) {
     }).join('');
 }
 
-// Search residents
+// Search residents (by name, email, phone, address, birthplace, profession)
 function searchResidents() {
-    const searchTerm = document.getElementById('search-residents').value.toLowerCase();
+    const searchTerm = document.getElementById('search-residents').value.toLowerCase().trim();
     
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const guestRequests = JSON.parse(localStorage.getItem('guestRequests') || '[]');
@@ -625,11 +649,27 @@ function searchResidents() {
         }
     });
     
-    const filtered = residents.filter(r => 
-        r.fullName.toLowerCase().includes(searchTerm) ||
-        (r.email && r.email.toLowerCase().includes(searchTerm)) ||
-        (r.phone && r.phone.includes(searchTerm))
-    );
+    if (!searchTerm) {
+        displayResidents(residents, userRequests, guestRequests);
+        return;
+    }
+    
+    const filtered = residents.filter(r => {
+        const fullName = buildFullName(r);
+        return (
+            fullName.toLowerCase().includes(searchTerm) ||
+            (r.firstName && r.firstName.toLowerCase().includes(searchTerm)) ||
+            (r.lastName && r.lastName.toLowerCase().includes(searchTerm)) ||
+            (r.middleName && r.middleName.toLowerCase().includes(searchTerm)) ||
+            (r.email && r.email.toLowerCase().includes(searchTerm)) ||
+            (r.phone && r.phone.includes(searchTerm)) ||
+            (r.address && r.address.toLowerCase().includes(searchTerm)) ||
+            (r.birthplace && r.birthplace.toLowerCase().includes(searchTerm)) ||
+            (r.profession && r.profession.toLowerCase().includes(searchTerm)) ||
+            (r.citizenship && r.citizenship.toLowerCase().includes(searchTerm)) ||
+            (r.highestEducationAttainment && r.highestEducationAttainment.toLowerCase().includes(searchTerm))
+        );
+    });
     
     displayResidents(filtered, userRequests, guestRequests);
 }

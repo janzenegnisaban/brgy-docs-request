@@ -13,23 +13,46 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    document.getElementById('fullName').value = profile.fullName || '';
-    document.getElementById('birthdate').value = profile.birthdate || '';
-    document.getElementById('address').value = profile.address || '';
+    // Support legacy users with only fullName
+    document.getElementById('lastName').value = profile.lastName || '';
+    document.getElementById('firstName').value = profile.firstName || (profile.fullName || '');
+    document.getElementById('middleName').value = profile.middleName || '';
+    document.getElementById('suffix').value = profile.suffix || '';
     document.getElementById('email').value = profile.email || '';
     document.getElementById('phone').value = profile.phone || '';
+    document.getElementById('birthplace').value = profile.birthplace || '';
+    document.getElementById('birthdate').value = profile.birthdate || '';
+    document.getElementById('sex').value = profile.sex || '';
+    document.getElementById('civilStatus').value = profile.civilStatus || '';
+    document.getElementById('citizenship').value = profile.citizenship || 'Filipino';
+    document.getElementById('profession').value = profile.profession || '';
+    document.getElementById('highestEducationAttainment').value = profile.highestEducationAttainment || '';
+    document.getElementById('address').value = profile.address || '';
 
     document.getElementById('profile-form').addEventListener('submit', function(e) {
         e.preventDefault();
         const alertContainer = document.getElementById('alert-container');
-        const fullName = document.getElementById('fullName').value.trim();
-        const birthdate = document.getElementById('birthdate').value;
-        const address = document.getElementById('address').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const firstName = document.getElementById('firstName').value.trim();
+        const middleName = document.getElementById('middleName').value.trim();
+        const suffix = document.getElementById('suffix').value.trim();
         const phone = document.getElementById('phone').value.trim();
+        const birthplace = document.getElementById('birthplace').value.trim();
+        const birthdate = document.getElementById('birthdate').value;
+        const sex = document.getElementById('sex').value;
+        const civilStatus = document.getElementById('civilStatus').value;
+        const citizenship = document.getElementById('citizenship').value.trim();
+        const profession = document.getElementById('profession').value.trim();
+        const highestEducationAttainment = document.getElementById('highestEducationAttainment').value;
+        const address = document.getElementById('address').value.trim();
         const currentPassword = document.getElementById('currentPassword').value;
         const newPassword = document.getElementById('newPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
 
+        if (!lastName || !firstName) {
+            showAlert('Last name and first name are required', 'error', alertContainer);
+            return;
+        }
         if (!isValidPhone(phone)) {
             showAlert('Please enter a valid phone number (09XXXXXXXXX or +639XXXXXXXXX)', 'error', alertContainer);
             return;
@@ -51,16 +74,27 @@ document.addEventListener('DOMContentLoaded', function() {
             profile.password = newPassword;
         }
 
+        const fullName = [firstName, middleName, lastName, suffix].filter(Boolean).join(' ');
+        profile.lastName = lastName;
+        profile.firstName = firstName;
+        profile.middleName = middleName;
+        profile.suffix = suffix;
         profile.fullName = fullName;
-        profile.birthdate = birthdate;
-        profile.address = address;
         profile.phone = normalizePhone(phone);
+        profile.birthplace = birthplace || null;
+        profile.birthdate = birthdate;
+        profile.sex = sex || null;
+        profile.civilStatus = civilStatus || null;
+        profile.citizenship = citizenship || 'Filipino';
+        profile.profession = profession || null;
+        profile.highestEducationAttainment = highestEducationAttainment || null;
+        profile.address = address;
         profile.updatedAt = new Date().toISOString();
 
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const idx = users.findIndex(u => u.id === user.id);
-        if (idx >= 0) users[idx] = profile;
-        localStorage.setItem('users', JSON.stringify(users));
+        const usersList = JSON.parse(localStorage.getItem('users') || '[]');
+        const idx = usersList.findIndex(u => u.id === user.id);
+        if (idx >= 0) usersList[idx] = profile;
+        localStorage.setItem('users', JSON.stringify(usersList));
 
         localStorage.setItem('currentUser', JSON.stringify({
             id: user.id,

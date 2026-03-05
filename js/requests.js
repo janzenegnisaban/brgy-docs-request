@@ -130,6 +130,25 @@ function updateFormForDocument(docType) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Prefill form for logged-in users
+    var currentUser = getCurrentUser();
+    if (currentUser) {
+        var users = JSON.parse(localStorage.getItem('users') || '[]');
+        var profile = users.find(function(u) { return u.id === currentUser.id; });
+        if (profile) {
+            var fullNameEl = document.getElementById('fullName');
+            var addressEl = document.getElementById('address');
+            var birthdateEl = document.getElementById('birthdate');
+            var emailEl = document.getElementById('email');
+            var phoneEl = document.getElementById('phone');
+            if (fullNameEl) fullNameEl.value = buildFullName(profile);
+            if (addressEl) addressEl.value = profile.address || '';
+            if (birthdateEl) birthdateEl.value = profile.birthdate || '';
+            if (emailEl) emailEl.value = profile.email || '';
+            if (phoneEl) phoneEl.value = profile.phone || '';
+        }
+    }
+
     var docParam = getQueryParam('doc');
     if (docParam) {
         var select = document.getElementById('documentType');
